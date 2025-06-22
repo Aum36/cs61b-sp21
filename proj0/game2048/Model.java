@@ -1,5 +1,6 @@
 package game2048;
 
+import java.sql.Array;
 import java.util.Formatter;
 import java.util.Observable;
 
@@ -137,7 +138,11 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
+        for(Tile t : b) {
+            if(t == null) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -147,7 +152,9 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
+        for(Tile t : b) {
+            if(t.value() == MAX_PIECE) return true;
+        }
         return false;
     }
 
@@ -158,10 +165,36 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        return emptySpaceExists(b) || adjacentWithSameValueExists(b);
+    }
+
+    public static boolean adjacentWithSameValueExists(Board b) {
+        for(Tile t : b) {
+            int tVal = t.value();
+            int size = b.size();
+            int col = t.col(), row = t.row();
+            /* Looking for neighbours with same value */
+            if (
+                    (isInBoardRange(col, row + 1, size)
+                            && (tVal == getTileValue(b, col, row + 1)))
+                    || (isInBoardRange(col + 1, row, size)
+                            && (tVal == getTileValue(b, col + 1, row)))
+                    || (isInBoardRange(col, row - 1, size)
+                            && (tVal == getTileValue(b, col, row - 1)))
+                    || (isInBoardRange(col - 1, row, size)
+                            && (tVal == getTileValue(b, col - 1, row)))
+            ) return true;
+        }
         return false;
     }
 
+    public static boolean isInBoardRange(int col, int row, int size) {
+        return (col > 0) && (col < size) && (row > 0) && (row < size);
+    }
+
+    public static int getTileValue(Board b, int col, int row) {
+        return b.tile(col, row).value();
+    }
 
     @Override
      /** Returns the model as a string, used for debugging. */
