@@ -114,12 +114,105 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        // this.board.setViewingPerspective(Side.opposite(side));
+        // Writing logic only for north => The move is UP => each row increments by one
+        // Two operations => Move and Merge
+        // Merge First then Move
+        // Example:
+        // |   |   |   | 2 |
+        // | 2 |   | 4 |   |
+        // | 2 | 2 | 2 |   |
+        // | 2 | 2 | 2 | 2 |
 
+        // Merge
+        // |   |   |   |   |
+        // | 4 |   | 4 |   |
+        // |   | 4 | 4 |   |
+        // | 2 |   |   |   |
+
+        // Move
+        // | 4 | 4 | 4 | 4 |
+        // | 2 |   | 4 |   |
+        // |   |   |   |   |
+        // |   |   |   |   |
+
+        /* for(Tile t : this.board) {
+            int n = 1;
+            while(this.board.move(t.col(), t.row() + n, t)) {
+
+                n++;
+            }
+        } */
+
+        // Merge Step
+        // Find the topmost non-empty tile in the board
+        // If the current tile hasn't been merged before:
+        //   If current tile value is equal to the topmost tile perform merge with the
+        //   new tile in topmost row
+        // Repeat for all rows
+
+        for(Tile t : this.board) {
+            if (t == null) continue;
+            Tile topMostTile = findTopMostTile(t.col(), t.row());
+            if (topMostTile != null && notMerged(t) && notMerged(topMostTile) && (t.value() == topMostTile.value())) {
+                this.board.move(topMostTile.col(), topMostTile.row(), t);
+                this.score += 2 * t.value();
+                changed = true;
+            }
+        }
+
+
+        // Move Step
+        // Find the topmost empty tile in the board
+        // Move the tile to that tile
+        for(Tile t : this.board) {
+            if (t == null) continue;
+            // Tile topMostTile = findTopMostRow(t.col(), t.row());
+            int row = findTopMostEmptyRow(t.col(), t.row());
+            if (row != t.row()) this.board.move(t.col(), row, t);
+            changed = true;
+        }
+
+
+//        for(Tile t : this.board) {
+//            int col = t.col(), row = t.row();
+//            if (row == 0) contine;
+//            if(isAboveEmpty()) {
+//                this.board.move(col, row + 1, t);
+//            } else {
+//                if (t.value() == getTileValue(this.board, col, row + 1)) {
+//
+//                }
+//            }
+//
+//        }
+
+        // this.board.setViewingPerspective(Side.NORTH);
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
+    }
+
+    private Tile findTopMostTile(int col, int curRow) {
+        Tile tile = null;
+        for(int r = curRow + 1; r < size(); r++) {
+            if (this.board.tile(col, r) == null) return tile;
+            tile = this.board.tile(col, r);
+        }
+        return tile;
+    }
+
+    private int findTopMostEmptyRow(int col, int curRow) {
+        int r;
+        for(r = curRow + 1; r < size(); r++) {
+            if (this.board.tile(col, r) != null) return r - 1;
+        }
+        return r - 1;
+    }
+    public static boolean notMerged(Tile t) {
+        return !(t.next().value() == 2 * t.value());
     }
 
     /** Checks if the game is over and sets the gameOver variable
@@ -153,7 +246,7 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         for(Tile t : b) {
-            if(t.value() == MAX_PIECE) return true;
+            if(t != null && t.value() == MAX_PIECE) return true;
         }
         return false;
     }
