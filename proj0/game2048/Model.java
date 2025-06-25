@@ -111,28 +111,34 @@ public class Model extends Observable {
         boolean changed;
         changed = false;
 
+        boolean[][] mergedArr = new boolean[size()][size()];
+        for(int i = 0; i < size(); i++) {
+            for(int j = 0; j < size(); j++) {
+                mergedArr[i][j] = false;
+            }
+        }
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-        // this.board.setViewingPerspective(Side.opposite(side));
+        this.board.setViewingPerspective(side);
         // Writing logic only for north => The move is UP => each row increments by one
         // Two operations => Move and Merge
         // Merge First then Move
         // Example:
         // |   |   |   | 2 |
-        // | 2 |   | 4 |   |
+        // | 2 |   | 4 | 2 |
         // | 2 | 2 | 2 |   |
-        // | 2 | 2 | 2 | 2 |
+        // | 2 | 2 | 2 | 4 |
 
         // Merge
-        // |   |   |   |   |
+        // |   |   |   | 4 |
         // | 4 |   | 4 |   |
         // |   | 4 | 4 |   |
-        // | 2 |   |   |   |
+        // | 2 |   |   | 4 |
 
         // Move
         // | 4 | 4 | 4 | 4 |
-        // | 2 |   | 4 |   |
+        // | 2 |   | 4 | 4 |
         // |   |   |   |   |
         // |   |   |   |   |
 
@@ -153,25 +159,30 @@ public class Model extends Observable {
 
         for(Tile t : this.board) {
             if (t == null) continue;
-            Tile topMostTile = findTopMostTile(t.col(), t.row());
-            if (topMostTile != null && notMerged(t) && notMerged(topMostTile) && (t.value() == topMostTile.value())) {
-                this.board.move(topMostTile.col(), topMostTile.row(), t);
+            System.out.println("Processing tile: " + t);
+            Tile topMostTile = findTopMostTile(side, t);
+            if (topMostTile != null && notMerged(side, topMostTile, mergedArr) && (t.value() == topMostTile.value())) {
+                System.out.println("\t Merged" + t + " and " + topMostTile);
+                int col = topMostTile.col();
+                int row = topMostTile.row();
+                mergedArr[getCol(side, col, row)][getRow(side, col, row)] = this.board.move(col, row, t);
                 this.score += 2 * t.value();
                 changed = true;
             }
         }
+        System.out.println("-----");
 
 
         // Move Step
         // Find the topmost empty tile in the board
         // Move the tile to that tile
-        for(Tile t : this.board) {
-            if (t == null) continue;
-            // Tile topMostTile = findTopMostRow(t.col(), t.row());
-            int row = findTopMostEmptyRow(t.col(), t.row());
-            if (row != t.row()) this.board.move(t.col(), row, t);
-            changed = true;
-        }
+//        for(Tile t : this.board) {
+//            if (t == null) continue;
+//            // Tile topMostTile = findTopMostRow(t.col(), t.row());
+//            int row = findTopMostEmptyRow(side, t.col(), t.row());
+//            this.board.move(t.col(), row, t);
+//            changed = true;
+//        }
 
 
 //        for(Tile t : this.board) {
@@ -187,7 +198,7 @@ public class Model extends Observable {
 //
 //        }
 
-        // this.board.setViewingPerspective(Side.NORTH);
+        this.board.setViewingPerspective(Side.NORTH);
         checkGameOver();
         if (changed) {
             setChanged();
@@ -195,24 +206,43 @@ public class Model extends Observable {
         return changed;
     }
 
-    private Tile findTopMostTile(int col, int curRow) {
-        Tile tile = null;
-        for(int r = curRow + 1; r < size(); r++) {
-            if (this.board.tile(col, r) == null) return tile;
+    public int getCol(Side side, int col, int row) {
+        return side.col(col, row, size());
+    }
+
+    public int getRow(Side side, int col, int row) {
+        return side.col(col, row, size());
+    }
+
+    /** Finds the closest non-empty tile in the board */
+    private Tile findTopMostTile(Side s, Tile t) {
+        int col = getCol(s, t.col(), t.row());
+        int r = getRow(s, t.col(), t.row() + 1);
+        System.out.println("Initial Coordinates: (" + col + ", " + r + ") ");
+        Tile tile = tile(col, r);
+        while(r < size() && r >= 0) {
+            System.out.print("\t Coordinates: (" + col + ", " + r + ") " + tile);
+            System.out.println("\t " + r);
+            if (this.board.tile(col, r) != null) return tile;
             tile = this.board.tile(col, r);
+            r = getRow(s, col, r + 1);
         }
         return tile;
     }
 
-    private int findTopMostEmptyRow(int col, int curRow) {
+    /** Finds the topmost empty tile in the board before another non-empty tile */
+    private int findTopMostEmptyRow(Side s, int col, int curRow) {
         int r;
-        for(r = curRow + 1; r < size(); r++) {
+        for(r = getRow(s,col, curRow + 1); r < size() && r > 0; r++) {
             if (this.board.tile(col, r) != null) return r - 1;
         }
         return r - 1;
     }
-    public static boolean notMerged(Tile t) {
-        return !(t.next().value() == 2 * t.value());
+//    public static boolean notMerged(Tile t) {
+//        return !(t.next().value() == 2 * t.value());
+//    }
+    public boolean notMerged(Side s, Tile t, boolean[][] arr) {
+        return !arr[getCol(s, t.col(), t.row())][getRow(s, t.col(), t.row())];
     }
 
     /** Checks if the game is over and sets the gameOver variable
