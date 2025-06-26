@@ -199,11 +199,11 @@ public class Model extends Observable {
      *  Returns the row index of the tile */
     private int findTopMostRow(int col, int row) {
         int r = row + 1;
-        System.out.println("\t Initial Coordinates: (" + col + ", " + r + ") ");
+        // System.out.println("\t Initial Coordinates: (" + col + ", " + r + ") ");
         Tile tile;
         while(r < size() && r >= 0) {
             tile = tile(col, r);
-            System.out.println("\t Coordinates: (" + col + ", " + r + ") " + tile);
+            // System.out.println("\t Coordinates: (" + col + ", " + r + ") " + tile);
             if (tile(col, r) != null) return r;
             r = r + 1;
         }
