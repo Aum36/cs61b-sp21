@@ -9,10 +9,10 @@ public class Primes {
      * and ensuring that its return value makes sense.
      *
      * If you're curious, this algorithm uses Fermat's Little Theorem as a
-     * primality test, and returns the correct answer w.h.p. (due to the presence)
-     * of Carmichael numbers. If this makes no sense to you, good! It shouldn't.
-     * The goal of this function is to make sure you learn to abstract away the inner
-     * workings of a function and debug it as a black-box with the "Step Over" feature.
+     *      * primality test, and returns the correct answer w.h.p. (due to the presence)
+     *      * of Carmichael numbers. If this makes no sense to you, good! It shouldn't.
+     *      * The goal of this function is to make sure you learn to abstract away the inner
+     *      * workings of a function and debug it as a black-box with the "Step Over" feature.
      *
      * @source: https://www.geeksforgeeks.org/primality-test-set-2-fermet-method/
      * @param n an arbitary integrer
@@ -24,8 +24,7 @@ public class Primes {
         if (n <= 3) return true;
 
         int k = 3; // Try k = 3 times
-        while (k > 0)
-        {
+        while (k > 0) {
             // Pick a random number in [2..n-2]
             // Above corner cases make sure that n > 4
             int a = 2 + (int)(Math.random() % (n - 4));
