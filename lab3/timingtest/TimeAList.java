@@ -22,7 +22,7 @@ public class TimeAList {
     }
 
     public static void timeAListConstruction() {
-        int[] arrNs = {1000, 2000, 4000, 8000, 16000, 32000, 64000, 128000, 10000000};
+        int[] arrNs = {1000, 2000, 4000, 8000, 16000, 32000, 64000};
         AList<Integer> Ns = new AList<>();
         AList<Double> times = new AList<>();
         Stopwatch sw = new Stopwatch();
