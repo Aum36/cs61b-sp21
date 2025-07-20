@@ -28,14 +28,13 @@ public class TimeSLList {
         AList<Integer> opCounts = new AList<>();
         int M = 10000;
         Stopwatch sw = new Stopwatch();
-        double time = 0;
+        double time;
         for(int n : arrNs) {
             SLList<Integer> dummyList = new SLList<>();
             // Timing Code
             for(int i = 0; i < n; i++){
                 dummyList.addLast(i);
             }
-            System.out.println(dummyList.size());
             time = sw.elapsedTime();
             for(int i = 0; i < M; i++) {
                 dummyList.addLast(M);
