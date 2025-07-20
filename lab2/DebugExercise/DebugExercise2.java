@@ -34,6 +34,11 @@ public class DebugExercise2 {
         return xor;
     }
 
+    /** Returns the max of two integers */
+    public static int max(int a, int b) {
+        return Math.max(a, b);
+    }
+
     /** Returns a new array where entry i is the max of
      * a[i] and b[i]. For example, if a = {1, -10, 3}
      * and b = {0, 20, 5}, this function will return {1, 20, 5}.
@@ -45,7 +50,7 @@ public class DebugExercise2 {
         }
         int[] returnArray = new int[a.length];
         for (int i = 0; i < a.length; i += 1) {
-            int biggerValue = Math.max(a[i], b[i]);
+            int biggerValue = max(a[i], b[i]);
             returnArray[i] = biggerValue;
         }
 
